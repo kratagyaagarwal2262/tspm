@@ -1,6 +1,6 @@
 ---
 name: flutter-design
-description: Judge and shape what a screen looks like and how it moves, when no design source settles it: visual hierarchy, the states a build skips, and whether something should animate at all. Use when building UI without a design source, when acceptance criteria or a spec have just been settled and the app still has no design language, when choosing spacing, type scale or emphasis, when a screen needs loading, empty, error or first-run states, or when adding animation, transitions, gestures or haptics.
+description: "Judge and shape what a screen looks like and how it moves, when no design source settles it: visual hierarchy, the states a build skips, and whether something should animate at all. Use when building UI without a design source, when acceptance criteria or a spec have just been settled and the app still has no design language, when choosing spacing, type scale or emphasis, when a screen needs loading, empty, error or first-run states, or when adding animation, transitions, gestures or haptics."
 ---
 
 # Flutter design
@@ -12,6 +12,12 @@ draw, and the decision a Figma node cannot contain because it is about behaviour
 
 Those decisions get made either way. Left unnamed, they get made by whatever the first draft happened
 to produce.
+
+For a full screen or design-language pass, if `docs/agents/agent-routing.md` exists, delegate a
+bounded design brief to its UI agent after reading the accepted criteria and current design source.
+The parent checks the result against this skill's gates and integrates any shared design tokens.
+Keep a small state or spacing decision in the parent task. The agent configuration selects model
+and effort; invoking this skill alone does not change the parent task's model.
 
 ## What this skill does not own
 

@@ -259,15 +259,17 @@ When the feature is large, delegate independent phases to sub-agents in parallel
 the Phase 1 tables are stable: a sub-agent given a table that is still moving builds against a shape
 that will change under it.
 
-Invoke the matching skill for each phase once the Phase 1 tables are stable. Pass the table that
-owns that phase along with the skill invocation.
+When this project has `docs/agents/agent-routing.md`, select the matching custom agent there for
+each delegated phase. Pass the table that owns the phase, its matching skill invocation, acceptance
+criteria, and exclusive file ownership. Start the delegated phase without an extra user prompt.
+If no project routing file exists, use the matching skill with a general sub-agent.
 
 | Phase | The sub-agent's skill | What to hand it |
 |-------|----------------------|-----------------|
-| 3 – Models | `flutter-create-model` | The Schema Field Map (1c) |
-| 4 – Repository | `flutter-create-repository` | The API Contract Table (1b) |
-| 6 – Widgets | `flutter-create-screen` | The Design Token Map (1d) and Layout Plan (1e) |
-| 8 – Tests | `flutter-write-tests` | The Feature Design Table (1a) and the acceptance criteria |
+| 3 – Models | `$flutter-create-model` | The Schema Field Map (1c) |
+| 4 – Repository | `$flutter-create-repository` | The API Contract Table (1b) |
+| 6 – Widgets | `$flutter-create-screen` | The Design Token Map (1d) and Layout Plan (1e) |
+| 8 – Tests | `$flutter-write-tests` | The Feature Design Table (1a) and the acceptance criteria |
 
 ---
 

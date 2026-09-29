@@ -7,6 +7,10 @@ description: Generate a screen (view + widgets) from a Figma node URL (read via 
 
 Generate Flutter view + widgets from design assets.
 
+For a full screen, when `docs/agents/agent-routing.md` exists, delegate the bounded UI build to
+its UI agent after the design source, token map, state contract, and owned files are clear. The
+parent integrates route and shared-core changes. Keep a small widget edit in the parent task.
+
 ## Architecture
 
 Before creating UI, constants, dialogs, or shared helpers, invoke `$flutter-core-architecture`. Reuse what it lists; do not invent parallel dialogs, text widgets, or theme constants.

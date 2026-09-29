@@ -19,7 +19,7 @@ Project facts read by the Flutter Engineering Kit skills. Update this file when 
 | Flavors | None |
 | Backend and integrations | None wired |
 | Safe verification surface | Widget tests only; no backend or real data |
-| Design source | Not provided yet |
+| Design source | Confirmed product plan in `docs/specs/tspm-product-plan.md`; design language in `docs/agents/design.md`; draft vision in `docs/specs/product-vision.md` |
 | Issue tracker | None; use `docs/specs/` for specs |
 | Test account | None |
 | Startup gates before `runApp` | None |
@@ -46,7 +46,9 @@ Project facts read by the Flutter Engineering Kit skills. Update this file when 
 | Specs and acceptance criteria | `docs/specs/` |
 | Domain glossary | `CONTEXT.md` (create when domain terms are settled) |
 | Architecture decisions | `docs/adr/` |
-| Design language | `docs/agents/design.md` (create after product direction is settled) |
+| Design language | `docs/agents/design.md` (settled direction and proposed visual defaults; device review pending) |
+| Product plan and acceptance criteria | `docs/specs/tspm-product-plan.md` (confirmed product handoff; release scope source) |
+| Product vision | `docs/specs/product-vision.md` (draft; not implementation acceptance criteria) |
 
 ## Verification
 

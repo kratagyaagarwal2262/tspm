@@ -10,6 +10,11 @@ interviewing was `$grill`'s job, and re-asking here spends the alignment twice. 
 does not contain enough to write a spec, say which sections you cannot fill, then invoke `$grill` to
 settle them rather than inventing the gaps.
 
+For a substantial spec, if `docs/agents/agent-routing.md` exists, use its architecture agent for a
+bounded structure and scope review. If the spec defines a quantitative or health interpretation,
+use its analytics agent for that method alone. The parent remains responsible for the user-facing
+contract and writing the final spec. Small specs stay in the parent task.
+
 Write to the directory `docs/agents/project.md` names for specs (`docs/specs/` by default), as
 `docs/specs/<NN>-<slug>.md`. If the project config names a real issue tracker, publish there
 instead and link it from the file.

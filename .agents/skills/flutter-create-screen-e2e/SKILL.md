@@ -364,9 +364,11 @@ When the screen is large, delegate independent phases to sub-agents in parallel.
 the Phase 1 tables are stable: a sub-agent given a table that is still moving builds against a shape
 that will change under it.
 
-Invoke the matching skill for each phase once the Phase 1 tables are stable, passing the relevant
-table along with the skill invocation. Phases 3 and 4 stay in this workflow because the fixture
-model and repository are its own output.
+When this project has `docs/agents/agent-routing.md`, select the matching custom agent there for
+each delegated phase. Pass the relevant table, matching skill invocation, acceptance criteria, and
+exclusive file ownership. Start the delegated phase without an extra user prompt. If no project
+routing file exists, use the matching skill with a general sub-agent. Phases 3 and 4 stay in this
+workflow because the fixture model and repository are its own output.
 
 | Phase | Skill |
 |-------|-------|

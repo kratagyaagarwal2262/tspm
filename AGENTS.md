@@ -7,6 +7,8 @@ This is the `tspm` Flutter app. Keep the existing counter app working while prod
 - Project-local skills are in `.agents/skills/`. Invoke a workflow with its Codex skill name, such as `$setup-flutter-project`, `$grill`, `$flutter-plan-change`, `$flutter-implement`, or `$flutter-verify`.
 - Read `.agents/skills/project-conventions/SKILL.md` when matching the app's current stack, and `.agents/skills/flutter-core-architecture/SKILL.md` before adding shared architecture.
 - Project facts and decisions belong in `docs/agents/project.md`; update it when the actual stack or commands change.
+- For TSPM product work, read the confirmed product plan linked from `docs/agents/project.md`. Use the draft vision for background; the confirmed plan controls release scope and acceptance criteria. Keep estimates, observations, and inferred trends distinct.
+- For substantial work that splits cleanly, use the project Codex agents described in `docs/agents/agent-routing.md`. The selected task model remains the coordinator; delegate only a bounded part with clear inputs and file ownership.
 - Kit templates are in `.agents/template/`. These are a local snapshot; edit project files, not copied templates, unless intentionally changing the kit snapshot.
 
 ## Current app conventions

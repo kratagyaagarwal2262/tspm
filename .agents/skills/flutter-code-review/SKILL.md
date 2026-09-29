@@ -1,6 +1,6 @@
 ---
 name: flutter-code-review
-description: Review changes on two independent axes: does the code follow the project's conventions, and does it do what the spec asked. Use when the user wants a branch, PR, or work-in-progress reviewed, or asks to review since a commit or branch.
+description: "Review changes on two independent axes: does the code follow the project's conventions, and does it do what the spec asked. Use when the user wants a branch, PR, or work-in-progress reviewed, or asks to review since a commit or branch."
 ---
 
 # Flutter code review
@@ -78,6 +78,10 @@ Each reads *what it is* → *why it matters here*.
   project treats those markers as a temporary state. → Ships a stub as a feature.
 
 ## 4. Spawn both axes in parallel
+
+When `docs/agents/agent-routing.md` exists, use its reviewer role for both axes as two separate
+sub-agents. The role fixes their model and effort; the briefs below keep the axes independent.
+Start them without an extra user prompt once the fixed point and spec are known.
 
 **Conventions sub-agent.** Give it the diff command, the commit list, the project's documented rule
 files, and **the baseline above pasted in full** — it has no other access to it. Brief: report, per

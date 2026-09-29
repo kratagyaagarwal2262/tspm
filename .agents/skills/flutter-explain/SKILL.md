@@ -11,6 +11,10 @@ relevant files directly and keep the explanation grounded in what the code does 
 Explain what the code **does**, not what it should do. Where you find a bug while reading, say so
 separately at the end rather than describing the intended behaviour as if it were real.
 
+For a whole-repo or multi-feature map, when `docs/agents/agent-routing.md` exists, delegate
+bounded read-only discovery to its exploration agent and synthesize the explanation from the
+returned file evidence. Keep a one-file or one-symbol lookup in the parent task.
+
 ## Pick the zoom level
 
 | The question | Scope |

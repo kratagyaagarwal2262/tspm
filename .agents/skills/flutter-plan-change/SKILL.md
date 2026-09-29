@@ -1,6 +1,6 @@
 ---
 name: flutter-plan-change
-description: Design a change before writing it: the types, signatures and module boundaries it needs, and the order the work lands in. Use before implementing anything touching more than one file, when a change needs a technical design, or when deciding between implementation approaches.
+description: "Design a change before writing it: the types, signatures and module boundaries it needs, and the order the work lands in. Use before implementing anything touching more than one file, when a change needs a technical design, or when deciding between implementation approaches."
 ---
 
 # Plan change
@@ -13,6 +13,13 @@ user and deliberately excludes file paths and code. This skill picks the types, 
 order, and it starts from a settled requirement. Where the requirement is not settled, invoke
 `$grill` first: designing against a guess produces a good design for the wrong
 problem.
+
+For a substantial cross-feature change, if `docs/agents/agent-routing.md` exists, delegate the
+technical sketch to its architecture agent after grounding in the current code and settled spec.
+Use its analytics agent as a separate, bounded consultation when the change defines a quantitative
+or health interpretation. The parent integrates the sketch and presents it to the user. A small
+change stays in the parent task. Agent model and effort come from the agent configuration; this
+skill does not change the parent task's model.
 
 ## 1. Ground
 
