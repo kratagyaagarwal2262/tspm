@@ -1,0 +1,6 @@
+interface:
+  display_name: "Flutter Implement"
+  short_description: "Drive a spec or sketch to a reviewed, verified commit: test-first at the agreed "
+  default_prompt: "Use $flutter-implement to Drive a spec or sketch to a reviewed, verified commit: test-first at the agreed seams, then analyze, test, rev."
+policy:
+  allow_implicit_invocation: false

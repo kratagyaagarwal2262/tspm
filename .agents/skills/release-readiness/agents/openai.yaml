@@ -1,0 +1,6 @@
+interface:
+  display_name: "Release Readiness"
+  short_description: "Before shipping to a live app, find what a change could break elsewhere and prov"
+  default_prompt: "Use $release-readiness to Before shipping to a live app, find what a change could break elsewhere and prove the one fact its safety depe."
+policy:
+  allow_implicit_invocation: false

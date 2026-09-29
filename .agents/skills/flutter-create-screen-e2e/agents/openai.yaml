@@ -1,0 +1,6 @@
+interface:
+  display_name: "Flutter Create Screen E2E"
+  short_description: "Build a screen backed by a FIXTURE repo from acceptance criteria and a Figma nod"
+  default_prompt: "Use $flutter-create-screen-e2e to Build a screen backed by a FIXTURE repo from acceptance criteria and a Figma node, before the model and API ex."
+policy:
+  allow_implicit_invocation: false

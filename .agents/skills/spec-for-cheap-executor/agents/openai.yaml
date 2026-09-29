@@ -1,0 +1,6 @@
+interface:
+  display_name: "Spec For Cheap Executor"
+  short_description: "Turn a feature request into one self-contained task doc a cheaper model can exec"
+  default_prompt: "Use $spec-for-cheap-executor to Turn a feature request into one self-contained task doc a cheaper model can execute end to end."
+policy:
+  allow_implicit_invocation: false
