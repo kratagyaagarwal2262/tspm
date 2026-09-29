@@ -374,7 +374,7 @@ pointing at the authoritative rule file rather than restating it.
 ## 11. Style contract
 
 The rules below are non-obvious and violated by default. Full spec:
-[CLAUDE.md](CLAUDE.md), `.claude/rules/flutter-ui.md`, `.cursor/rules/dart-conventions.mdc`.
+[AGENTS.md](AGENTS.md), `$flutter-core-architecture`, `$writing-for-agents`.
 
 | # | Rule | Example |
 |---|------|---------|

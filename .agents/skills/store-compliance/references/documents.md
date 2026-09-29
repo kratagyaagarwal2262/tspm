@@ -1,7 +1,7 @@
 # The document pack
 
-One spec per document. `store-doc-writer` reads the one it was assigned; the orchestrator uses the
-table to decide which documents exist for this app.
+Use the matching section below for each document. The table determines which documents this app
+needs.
 
 | Document | Written when |
 |---|---|

@@ -1,6 +1,6 @@
 interface:
   display_name: "Ask Kit"
-  short_description: "Ask which kit skill fits what you are about to do. A router over every skill in "
+  short_description: "Ask which kit skill fits what you are about to do"
   default_prompt: "Use $ask-kit to Ask which kit skill fits what you are about to do. A router over every skill in the engineering kit."
 policy:
   allow_implicit_invocation: false

@@ -259,8 +259,8 @@ When the feature is large, delegate independent phases to sub-agents in parallel
 the Phase 1 tables are stable: a sub-agent given a table that is still moving builds against a shape
 that will change under it.
 
-Each sub-agent's brief tells it to call the Codex skill with one skill, and carries the Phase 1 table
-it works from.
+Invoke the matching skill for each phase once the Phase 1 tables are stable. Pass the table that
+owns that phase along with the skill invocation.
 
 | Phase | The sub-agent's skill | What to hand it |
 |-------|----------------------|-----------------|

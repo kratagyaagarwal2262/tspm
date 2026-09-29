@@ -9,7 +9,7 @@ Project facts read by the Flutter Engineering Kit skills. Update this file when 
 | App display name | Flutter Demo (placeholder) |
 | Dart package | `tspm` |
 | Android application ID | `com.example.tspm` (placeholder) |
-| Platforms present | Android |
+| Platforms present | Android (minimum API 23) |
 | Repository remote | Not configured in this workspace |
 
 ## Environment

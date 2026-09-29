@@ -1,6 +1,6 @@
 interface:
   display_name: "Setup Flutter Project"
-  short_description: "Configure a Flutter repo for the engineering kit. Run once per project before us"
+  short_description: "Configure a Flutter repo for the engineering kit"
   default_prompt: "Use $setup-flutter-project to Configure a Flutter repo for the engineering kit. Run once per project before using the other skills."
 policy:
   allow_implicit_invocation: false

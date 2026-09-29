@@ -121,8 +121,8 @@ contains (with row counts), and any assumption you locked in on their behalf.
 
 ## After the executor runs
 
-When the cheap model has executed the doc and the user comes back with bugs, call the Codex skill
-with `triage-executor-bugs`. Bugs traced to an ambiguity in *this*
+When the executor has followed the doc and the user comes back with bugs, invoke
+`$triage-executor-bugs`. Bugs traced to an ambiguity in *this*
 doc are `spec-defect`s: they oblige a correction here (via
 [references/coupling.md](references/coupling.md)), not just a patch to the code. Recurring defect
 classes get promoted into [references/audit-checklist.md](references/audit-checklist.md) so the
@@ -139,7 +139,7 @@ next spec prevents them.
   input for computed ones.
 - **The doc is self-contained.** No "see the conversation", no ticket links as the only source
   of a requirement, no unexplained project jargon.
-- **Name the project's skills, agents and rules explicitly** (`$flutter-write-tests`, the
-  `flutter-state-engineer` agent, `.claude/rules/flutter-bloc.md`) rather than restating them.
+- **Name the project's skills explicitly** (for example, `$flutter-write-tests`) rather than
+  restating their guidance. Codex skills live under `.agents/skills/`.
 - **Verification is executable** — real commands, exact assertions, and at least one test that
   must **fail before** a named step and **pass after** it.

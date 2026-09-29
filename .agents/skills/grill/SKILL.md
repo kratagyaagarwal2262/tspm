@@ -36,9 +36,8 @@ write code until the user confirms the understanding is shared.
 
 ## Facts are yours, decisions are theirs
 
-Never ask the user something you could observe. Dispatch `flutter-explore` for anything in the
-codebase (does a constant already exist, what does the existing bloc emit, which route id is free)
-and read the design yourself through whatever `docs/agents/project.md` names as the design source.
+Never ask the user something you could observe. Inspect the codebase for existing constants, state,
+and route identifiers; read the design source named in `docs/agents/project.md`.
 A running exploration is an unsettled prerequisite: only questions downstream of it wait, so ask the
 rest of the frontier now.
 

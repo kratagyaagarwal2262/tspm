@@ -5,9 +5,8 @@ description: Explain how a Flutter feature, subsystem or codebase actually works
 
 # Flutter explain
 
-Answer "how does this work" from the code, at whichever zoom level the question is asked. Most of
-the reading should happen in a subagent: dispatch `flutter-explore` for the sweeps and keep the
-synthesis here, so the answer is written in a clean window rather than one full of file dumps.
+Answer "how does this work" from the code, at whichever zoom level the question is asked. Read the
+relevant files directly and keep the explanation grounded in what the code does today.
 
 Explain what the code **does**, not what it should do. Where you find a bug while reading, say so
 separately at the end rather than describing the intended behaviour as if it were real.

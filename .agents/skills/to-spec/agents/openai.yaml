@@ -1,6 +1,6 @@
 interface:
   display_name: "To Spec"
-  short_description: "Turn the current conversation into a written spec, with an explicit out-of-scope"
+  short_description: "Turn the current conversation into a written spec, with an explicit"
   default_prompt: "Use $to-spec to Turn the current conversation into a written spec, with an explicit out-of-scope section."
 policy:
   allow_implicit_invocation: false

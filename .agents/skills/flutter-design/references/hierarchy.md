@@ -12,7 +12,7 @@ linearly — slowly, and in whatever order the widget tree happened to produce. 
 reason a functionally correct screen reads as amateur.
 
 Contrast ratios, tap-target sizes and text scaling are the floor and are owned elsewhere: call the
-Skill tool with `flutter-accessibility`.
+`$flutter-accessibility`.
 
 ## One dominant element
 
@@ -100,8 +100,7 @@ meaning, the first meaning weakens everywhere it appears.
   also a hierarchy point: an icon or a label survives a screenshot, a theme change, and a user who
   cannot separate the hues.
 - **Muted greys are where hierarchy quietly fails.** Secondary text drifts toward the background
-  until it is decorative rather than readable. Have the ratio computed — call the Skill tool with
-  `flutter-accessibility` — rather than settling it by eye here. A grey that clears the floor against
+  until it is decorative rather than readable. Have the ratio computed — invoke `$flutter-accessibility` — rather than settling it by eye here. A grey that clears the floor against
   white can fail against a card surface or a dark theme, and those variants rarely get re-checked.
 
 A role is a named `AppColors` entry, declared as `flutter-core-architecture` §3 sets out. The
@@ -124,8 +123,7 @@ finding, not a copy finding, and adding words is the workaround rather than the 
 Microcopy is part of the hierarchy, because it is read before anything is pressed.
 
 - **Buttons name their action**, not their acknowledgement. "Save changes" beats "OK".
-- **Titles say what the screen is**, in the vocabulary the user brought. Call the Skill tool with
-  `domain-glossary` where the term is contested.
+- **Titles say what the screen is**, in the vocabulary the user brought. invoke `$domain-glossary` where the term is contested.
 - **Specific labels beat safe generic ones.** A navigation item named for its contents is
   predictable; an umbrella term is not.
 

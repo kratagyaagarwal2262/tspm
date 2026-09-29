@@ -1,6 +1,6 @@
 interface:
   display_name: "Retro"
-  short_description: "After a round of work, propose improvements to the kit and the project's agent e"
-  default_prompt: "Use $retro to After a round of work, propose improvements to the kit and the project's agent environment so the next round i."
+  short_description: "After a round of work, propose improvements to the kit and the project's"
+  default_prompt: "Use $retro to After a round of work, propose improvements to the kit and the project's agent environment so the next round is shorter."
 policy:
   allow_implicit_invocation: false

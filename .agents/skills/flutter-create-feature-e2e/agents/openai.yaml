@@ -1,6 +1,6 @@
 interface:
   display_name: "Flutter Create Feature E2E"
-  short_description: "Build or upgrade a complete feature (model, repo, bloc, view, widgets, tests) fr"
-  default_prompt: "Use $flutter-create-feature-e2e to Build or upgrade a complete feature (model, repo, bloc, view, widgets, tests) from a model spec, one API endpo."
+  short_description: "Build or upgrade a complete feature (model, repo, bloc, view, widgets, tests)"
+  default_prompt: "Use $flutter-create-feature-e2e to Build or upgrade a complete feature (model, repo, bloc, view, widgets, tests) from a model spec, one API endpoint, acceptance criteria and a..."
 policy:
   allow_implicit_invocation: false

@@ -16,8 +16,8 @@ else.
 ## What this needs
 
 A spec from `$to-spec`, a sketch from `flutter-plan-change`, or an acceptance-criteria list. Where
-none exists and the criteria are thin, stop and tell the user to run `$to-spec`, or call the Skill
-tool with `grill` to settle them first.
+none exists and the criteria are thin, stop and tell the user to run `$to-spec`, or invoke `$grill`
+to settle them first.
 
 **Where this is a new feature folder with a design and an endpoint**, this is the wrong skill. Tell
 the user to run `$flutter-create-feature-e2e`, which scaffolds all five layers from a Figma node and

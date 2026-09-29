@@ -221,4 +221,4 @@ cannot. Where a judgment depends on feel, say so and name the check rather than 
 - Judge gestures on a physical device in a release build, on the slowest hardware the app supports.
 - Look again the next day. Timing errors invisible during development surface with fresh eyes.
 
-For frame budget and jank rather than feel, call the Skill tool with `flutter-performance`.
+For frame budget and jank rather than feel, invoke `$flutter-performance`.

@@ -1,6 +1,6 @@
 interface:
   display_name: "Setup Ci"
-  short_description: "Generate a CI pipeline that runs the verification ladder on every push, and buil"
+  short_description: "Generate a CI pipeline that runs the verification ladder on every push, and"
   default_prompt: "Use $setup-ci to Generate a CI pipeline that runs the verification ladder on every push, and builds per flavor."
 policy:
   allow_implicit_invocation: false

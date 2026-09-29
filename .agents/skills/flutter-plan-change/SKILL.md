@@ -10,7 +10,7 @@ same decision found halfway through an implementation costs the implementation.
 
 This is the **technical** counterpart to a spec. `to-spec` writes what the software should do for a
 user and deliberately excludes file paths and code. This skill picks the types, the seams and the
-order, and it starts from a settled requirement. Where the requirement is not settled, call the
+order, and it starts from a settled requirement. Where the requirement is not settled, invoke
 `$grill` first: designing against a guess produces a good design for the wrong
 problem.
 

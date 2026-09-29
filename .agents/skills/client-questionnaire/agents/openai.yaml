@@ -1,6 +1,6 @@
 interface:
   display_name: "Client Questionnaire"
-  short_description: "Turn decisions you cannot make in-house into a questionnaire for the client to f"
+  short_description: "Turn decisions you cannot make in-house into a questionnaire for the client"
   default_prompt: "Use $client-questionnaire to Turn decisions you cannot make in-house into a questionnaire for the client to fill in."
 policy:
   allow_implicit_invocation: false

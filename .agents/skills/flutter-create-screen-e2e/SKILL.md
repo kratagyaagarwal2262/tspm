@@ -364,12 +364,12 @@ When the screen is large, delegate independent phases to sub-agents in parallel.
 the Phase 1 tables are stable: a sub-agent given a table that is still moving builds against a shape
 that will change under it.
 
-Each sub-agent's brief tells it to call the Codex skill with one skill, and carries the Phase 1 table
-it works from. Phases 3 and 4 stay with the parent, since the fixture model and repository are this
-skill's own output rather than another skill's.
+Invoke the matching skill for each phase once the Phase 1 tables are stable, passing the relevant
+table along with the skill invocation. Phases 3 and 4 stay in this workflow because the fixture
+model and repository are its own output.
 
-| Phase | Agent | The sub-agent's skill |
-|-------|-------|----------------------|
-| 5 – Bloc | `flutter-state-engineer` | `flutter-create-state-layer` |
-| 6 – UI | `flutter-ui-engineer` | `flutter-create-screen` |
-| 8 – Tests | `flutter-test-engineer` | `flutter-write-tests` |
+| Phase | Skill |
+|-------|-------|
+| 5 – Bloc | `$flutter-create-state-layer` |
+| 6 – UI | `$flutter-create-screen` |
+| 8 – Tests | `$flutter-write-tests` |

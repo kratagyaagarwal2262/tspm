@@ -1,17 +1,19 @@
 # tspm
 
-A new Flutter project.
+Tracking Super Pro Max. Helps you track weight but not like olden days. It's way more detailed. Trust me
 
-## Getting Started
+## Development
 
-This project is a starting point for a Flutter application.
+```sh
+flutter pub get
+flutter run
+dart format .
+flutter analyze
+flutter test
+```
 
-A few resources to get you started if this is your first Flutter project:
+## Codex and engineering conventions
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+Project guidance is in [AGENTS.md](AGENTS.md). The Flutter Engineering Kit skills are installed under `.agents/skills/`; use `$ask-kit` to choose a workflow. Project-specific architecture, platform, and verification facts are recorded in [docs/agents/project.md](docs/agents/project.md).
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The project is currently Android-only. The secure-storage baseline requires Android API 23 or newer.

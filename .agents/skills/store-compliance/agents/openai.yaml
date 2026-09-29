@@ -1,6 +1,6 @@
 interface:
   display_name: "Store Compliance"
-  short_description: "Generate the App Store / Google Play metadata, privacy, terms, permissions, SDK-"
-  default_prompt: "Use $store-compliance to Generate the App Store / Google Play metadata, privacy, terms, permissions, SDK-audit and release-checklist pa."
+  short_description: "Generate the App Store / Google Play metadata, privacy, terms, permissions,"
+  default_prompt: "Use $store-compliance to Generate the App Store / Google Play metadata, privacy, terms, permissions, SDK-audit and release-checklist pack for this app."
 policy:
   allow_implicit_invocation: false

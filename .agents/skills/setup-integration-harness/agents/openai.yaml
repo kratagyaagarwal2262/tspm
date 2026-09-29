@@ -1,6 +1,6 @@
 interface:
   display_name: "Setup Integration Harness"
-  short_description: "Stand up an integration test harness that boots the real app, prove it runs once"
-  default_prompt: "Use $setup-integration-harness to Stand up an integration test harness that boots the real app, prove it runs once, and record it so verificatio."
+  short_description: "Stand up an integration test harness that boots the real app, prove it runs"
+  default_prompt: "Use $setup-integration-harness to Stand up an integration test harness that boots the real app, prove it runs once, and record it so verification can reach the top rung."
 policy:
   allow_implicit_invocation: false

@@ -12,7 +12,8 @@ React Native, or Expo.
 guess, because these documents are published to users and read by a reviewer.
 
 The document specs live in [references/documents.md](references/documents.md). The prose conventions
-live in `rules/store-compliance-docs.md`. This file owns the order and the cross-checks.
+live in [references/store-compliance-docs.md](references/store-compliance-docs.md). This file owns
+the order and the cross-checks.
 
 ## Inputs
 
@@ -29,8 +30,8 @@ output_dir:             # DEFAULT: docs/store/
 
 ## Phase 0. Intake
 
-Dispatch `flutter-explore` to read the business context: `README*`, `docs/**`, `CHANGELOG`, brand
-files, and any existing store configuration or release checklist.
+Read the business context from `README*`, `docs/**`, `CHANGELOG`, brand files, and any existing
+store configuration or release checklist.
 
 Then ask the user one grouped batch of questions, skipping anything the inputs or the repo already
 answered:
@@ -47,8 +48,8 @@ A declined answer becomes `TODO (client input needed)`. Never invent a business 
 
 ## Phase 1. Signal Inventory
 
-Dispatch `flutter-explore` again for the technical signals: manifests, plists, `*.xcprivacy`,
-entitlements, dependencies, and permission declarations.
+Read the technical signals from manifests, plists, `*.xcprivacy`, entitlements, dependencies, and
+permission declarations.
 
 Write the result to `{output_dir}/_signals.md` as a table mapping **source file → signal →
 documents affected**. No data practice, permission or third-party service is claimed in any
@@ -62,9 +63,8 @@ keeps the parent's window clear.
 Read [references/documents.md](references/documents.md) and decide which documents this app needs;
 the table there gives the condition for each.
 
-Then delegate to `store-doc-writer`, **once per document**, naming the document and passing the path
-to `_signals.md`. One writer produces every file, which is what keeps the governing law, the
-contacts and the URLs consistent without a reconciliation pass.
+Then produce each document from the same `_signals.md` inventory so the governing law, contacts, and
+URLs stay consistent across the pack.
 
 Write in this order, because each informs the next: privacy pack, then terms and subscription, then
 the ASO metadata whose reviewer notes depend on both, then the release checklist.

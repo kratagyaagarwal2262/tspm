@@ -1,4 +1,4 @@
-export 'package:dartz/dartz.dart';
+export 'package:dartz/dartz.dart' hide State;
 export 'package:dio/dio.dart';
 export 'package:equatable/equatable.dart';
 export 'package:flutter/material.dart';

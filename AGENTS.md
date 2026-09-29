@@ -13,7 +13,7 @@ This is the `tspm` Flutter app. Keep the existing counter app working while prod
 
 - Package: `tspm`; Android application ID: `com.example.tspm`.
 - The current app is a single counter screen. Preserve its behavior unless a product requirement replaces it.
-- Match the dependencies and patterns already used. Add a package only when a product capability needs it; do not add unused kit defaults automatically.
+- Match the dependencies and patterns already used. The kit baseline is installed; add future packages when a product capability needs them rather than following a checklist blindly.
 - Put feature code under `lib/features/<feature>/` and share code through `lib/core/` as the app grows. Avoid speculative layers and cross-feature imports.
 - Prefer `const`, explicit types, accessible controls, and adaptive layouts. Centralize repeated theme values and user-facing strings once they become shared.
 - Keep secrets out of source control. Use secure storage for sensitive device data; never disable TLS validation.

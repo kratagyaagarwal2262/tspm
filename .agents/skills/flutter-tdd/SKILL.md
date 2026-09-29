@@ -9,10 +9,10 @@ Write the test before the code, so the test is shaped by what the feature must d
 what the code happens to do. A test written afterwards passes because it was written against the
 implementation in front of you, which is why it so rarely catches the bug you feared.
 
-This skill owns the loop and the seam choice. It owns no templates and no evidence rules: call the
-`$flutter-write-tests` for the test shape, and with `flutter-verify` to report what
-was proven. Where the target is an existing bug rather than new behaviour, invoke `$flutter-diagnose-bug` instead. Its Phase 1 is this same red loop, built for a symptom nobody can
-yet explain.
+This skill owns the loop and the seam choice. It owns no templates and no evidence rules: invoke
+`$flutter-write-tests` for the test shape, and `$flutter-verify` to report what was proven. Where the
+target is an existing bug rather than new behaviour, invoke `$flutter-diagnose-bug` instead. Its
+Phase 1 is this same red loop, built for a symptom nobody can yet explain.
 
 ## 1. Pick the seam
 
