@@ -32,7 +32,7 @@ Keep TSPM as the internal codename and the Dart package name during design. Thes
 | Destination | Primary question or action | Essential content |
 |---|---|---|
 | Onboarding | What can this app responsibly estimate for me? | Age, equation sex input, height, current weight, goal; full optional baseline questionnaire; units; pregnancy/breastfeeding applicability; explanation of estimates. |
-| Today | Where am I, and what does the evidence suggest? | Dominant trend interpretation, current reading, eight compact metric cards, one plain-language insight, confidence and source links, quick add. |
+| Today | Where am I, and what does the evidence suggest? | Dominant trend interpretation, current reading, eight metric roles expressed through compact visual groups, one plain-language insight, confidence and source links, quick add. |
 | Quick add | What do I need to record right now? | Separate Weight, Intake, Expenditure, Activity and Measurements forms; each returns to Today or its originating screen. |
 | Trends | What changed over time? | Six selectable chart families, time windows, point tooltips, legends, method/source information. |
 | History | What was actually recorded? | Day-grouped timeline, all same-day observations, source labels, edit and delete actions, clear distinction between missing and zero. |
@@ -58,7 +58,7 @@ Store the original measurement instant and local UTC offset; group history and d
 
 ## 5. Dashboard concept
 
-The top of Today answers **“What is happening?”** with a trend-weight statement and direction, followed by one sentence of interpretation. Raw current weight sits beside it as the latest observation, labeled by time. Supporting cards show **Current, Trend, Intake, Expenditure, Deficit, Target, Progress and Confidence**. Cards without enough evidence show “Not enough data” and the next useful action rather than a placeholder number.
+The top of Today answers **“What is happening?”** with a trend-weight statement and direction, followed by one sentence of interpretation. Raw current weight sits beside it as the latest observation, labeled by time. Supporting visuals show **Current, Trend, Intake, Expenditure, Deficit, Target, Progress and Confidence** through an interactive weight chart, energy comparison, goal-progress track and coverage marks. Regions without enough evidence show “Not enough data” and the next useful action rather than a placeholder number.
 
 An insight card can say: “Your 7-day trend is lower. Today’s higher reading was taken in the evening; there is not yet enough paired history to adjust for time of day.” A conflict card says that energy logs and observed trend disagree, then names possible explanations without ranking a cause the data cannot establish. The source/method control on each estimate reveals inputs, observation period and confidence basis.
 
@@ -125,7 +125,7 @@ These formulas are product-model choices for an informational app, not diagnoses
 
 ### Confidence policy
 
-Confidence applies to a **specific interpretation**, never to the person or to the app as a whole. Show Low when a result depends mainly on a population equation, sparse logs or inconsistent measurement times. Show Moderate only when its minimum window and coverage gates are met and sources are identifiable. Reserve High for a stable, well-covered observed trend; a BMI-derived body-fat estimate cannot become High merely because it has more weight entries. The dashboard confidence card inherits the weakest evidence used by its headline interpretation and exposes the reason.
+Confidence applies to a **specific interpretation**, never to the person or to the app as a whole. Show Low when a result depends mainly on a population equation, sparse logs or inconsistent measurement times. Show Moderate only when its minimum window and coverage gates are met and sources are identifiable. Reserve High for a stable, well-covered observed trend; a BMI-derived body-fat estimate cannot become High merely because it has more weight entries. The dashboard confidence indicator inherits the weakest evidence used by its headline interpretation and exposes the reason.
 
 ## 8. Chart and visualization system
 
@@ -170,7 +170,7 @@ Loading indicators are local to the operation: a save marks its own control busy
 
 ## 12. Premium visual direction
 
-The design is **dark first, calm, precise and premium**, with a full light counterpart. Use ink surfaces, restrained borders, generous space, a limited type scale and one primary accent. The hero trend interpretation gets the strongest hierarchy; the current raw reading and supporting cards step down. Dense charts borrow the clarity of a financial dashboard without filling the home screen with a chart wall. Keep gradients rare and never use gym clichés or motivational copy.
+The design is **light by default, calm, precise and premium**, with a coordinated dark counterpart. Following the 1 October 2026 design review, use warm paper surfaces, burgundy emphasis and sand accents in the default light theme, with a deep burgundy-and-sand dark counterpart, restrained borders, generous space and a limited type scale. The hero trend interpretation is expressed through an interactive weight chart with a concise explanation; compact energy and goal comparisons step down. Preserve the eight information roles without requiring eight repetitive text cards. Detailed charts borrow the clarity of a financial dashboard. Today uses one dominant weight chart and compact energy/goal visuals; deeper analysis stays in Trends. Keep gradients rare and never use gym clichés or motivational copy.
 
 Expressive motion has a purpose: reveal a newly computed comparison, connect a quick-add sheet to its saved result, or show a what-if range changing. Frequent tab switches, keyboard opening and everyday chart scrubbing must remain responsive; motion never delays reading data. Reduced-motion settings remove travel, scale and overshoot while preserving state feedback. Every interactive control has a pressed state; chart series and confidence states have text/shape cues as well as color. Shared token and state decisions live in the design-language document.
 

@@ -1,3 +1,1 @@
-# Project defaults for new local Codex tasks. A model selected in the composer overrides these.
-model = "gpt-6-luna"
-model_reasoning_effort = "medium"
+# No project-level model or reasoning-effort defaults.
