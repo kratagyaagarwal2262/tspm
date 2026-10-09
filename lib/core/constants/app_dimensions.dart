@@ -11,4 +11,5 @@ abstract final class AppDimensions {
   static const double borderWidth = 1;
   static const double focusBorderWidth = 2;
   static const double minTapTarget = 48;
+  static const double readingMaxWidth = 640;
 }

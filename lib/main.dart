@@ -7,9 +7,14 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({this.themeMode = ThemeMode.light, super.key});
+  const MyApp({
+    this.themeMode = ThemeMode.light,
+    this.initialRoute = AppRoutes.home,
+    super.key,
+  });
 
   final ThemeMode themeMode;
+  final String initialRoute;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +33,7 @@ class MyApp extends StatelessWidget {
           ),
         );
       },
-      initialRoute: AppRoutes.home,
+      initialRoute: initialRoute,
       onGenerateRoute: AppRouter.onGenerateRoute,
     );
   }
