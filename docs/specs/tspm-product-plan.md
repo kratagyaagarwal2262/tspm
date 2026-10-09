@@ -45,6 +45,8 @@ The complete onboarding questionnaire also asks for waist, neck and relevant hip
 
 The onboarding sequence is: **(1)** purpose, local-data privacy and units; **(2)** required age, equation input, height and a timestamped starting weight; **(3)** optional body measurements and body-fat source; **(4)** optional steps/training pattern; **(5)** goal, pregnancy/breastfeeding applicability and a preview of available estimates. Each step can go back without losing answers.
 
+On 7 October 2026, the owner confirmed kg/cm as initial units with lb/in available. Required onboarding age is an integer of at least 18; height and weight must be finite and positive. Height outside 100–250 cm or starting weight outside 25–350 kg requires confirmation rather than a hard rejection or silent clamp. These are operational input checks, not calculation-model applicability limits. See the [project proposal](../vault/proposal.md) for delivery sequencing and [Sprint 1 criteria](tspm-sprint-1.md) for the first increment.
+
 ## 4. Daily logging flow
 
 1. **Open quick add.** The person picks one data type. There is no mandatory all-day form.

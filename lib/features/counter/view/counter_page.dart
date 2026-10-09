@@ -36,6 +36,12 @@ class _CounterView extends StatelessWidget {
                 );
               },
             ),
+            const SizedBox(height: AppDimensions.medium),
+            TextButton(
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(AppRoutes.product),
+              child: const Text(AppStrings.openProduct),
+            ),
           ],
         ),
       ),
