@@ -11,6 +11,9 @@ void main() {
   late Completer<void>? firstWriteEntered;
   late Completer<void>? secondWriteEntered;
   late bool failNextWrite;
+  late bool failNextRead;
+  late bool commitBeforeFailure;
+  late WriteOutcome writeFailureOutcome;
 
   setUp(() {
     persistedJson = null;
@@ -19,9 +22,18 @@ void main() {
     firstWriteEntered = null;
     secondWriteEntered = null;
     failNextWrite = false;
+    failNextRead = false;
+    commitBeforeFailure = false;
+    writeFailureOutcome = WriteOutcome.unknown;
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(_channel, (call) async {
-          if (call.method == 'read') return persistedJson;
+          if (call.method == 'read') {
+            if (failNextRead) {
+              failNextRead = false;
+              throw PlatformException(code: 'io');
+            }
+            return persistedJson;
+          }
           if (call.method == 'replace') {
             final nextJson = (call.arguments as Map)['nextJson'] as String;
             writes.add(nextJson);
@@ -30,9 +42,10 @@ void main() {
             if (writeGates.isNotEmpty) await writeGates.removeAt(0).future;
             if (failNextWrite) {
               failNextWrite = false;
+              if (commitBeforeFailure) persistedJson = nextJson;
               throw PlatformException(
                 code: 'io',
-                details: {'writeOutcome': 'unknown'},
+                details: {'writeOutcome': writeFailureOutcome.name},
               );
             }
             persistedJson = nextJson;
@@ -414,6 +427,50 @@ void main() {
       await blocked.close();
     },
   );
+
+  for (final retryFailure in ['read', 'acknowledgment', 'original-draft']) {
+    test(
+      'AC 9: uncertain completion reconciles $retryFailure before editing',
+      () async {
+        persistedJson = BaselineCodec.encode(
+          DraftBaselineSnapshot(draft: _validDraft()),
+        );
+        final bloc = _bloc();
+        bloc.add(const BaselineLoadRequested());
+        await bloc.stream.firstWhere((value) => value is BaselineEditing);
+        failNextWrite = true;
+        commitBeforeFailure = retryFailure != 'original-draft';
+        bloc.add(const BaselineCompletePressed());
+        final firstFailure =
+            await bloc.stream.firstWhere(
+                  (value) =>
+                      value is BaselineCompleting && value.saveFailure != null,
+                )
+                as BaselineCompleting;
+        expect(firstFailure.saveFailure!.writeOutcome, WriteOutcome.unknown);
+        failNextRead = retryFailure == 'read';
+        failNextWrite = retryFailure != 'read';
+        commitBeforeFailure = false;
+        writeFailureOutcome = WriteOutcome.notCommitted;
+        bloc.add(const BaselineRetryPressed());
+        final retried =
+            await bloc.stream.firstWhere(
+                  (value) => value is BaselineCompleting && !value.saving,
+                )
+                as BaselineCompleting;
+        final safeToEdit = retryFailure == 'original-draft';
+        expect(retried.candidate, firstFailure.candidate);
+        expect(
+          retried.saveFailure!.writeOutcome,
+          safeToEdit ? WriteOutcome.notCommitted : WriteOutcome.unknown,
+        );
+        bloc.add(const BaselineBackPressed());
+        await Future<void>.delayed(Duration.zero);
+        expect(bloc.state, safeToEdit ? isA<BaselineEditing>() : retried);
+        await bloc.close();
+      },
+    );
+  }
 
   test(
     'known not-committed completion failure allows editing retained answers',

@@ -1,4 +1,4 @@
-import '../../../core/router/exports.dart';
+import 'package:tspm/core/router/exports.dart';
 
 class BaselineLandingPage extends StatelessWidget {
   const BaselineLandingPage({

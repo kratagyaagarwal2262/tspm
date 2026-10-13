@@ -105,7 +105,6 @@ abstract final class AppStrings {
   static const String invalidTime = 'Choose a valid date and time.';
   static const String originalUnits = 'Original entry units';
   static const String reportedSource = 'Source: manually reported scale entry';
-  static const String goal = 'Saved intention';
   static const String goalDate = 'Intention recorded on';
   static const String unitOfEntry = 'Entry units';
   static const String applicability = 'Applicability';

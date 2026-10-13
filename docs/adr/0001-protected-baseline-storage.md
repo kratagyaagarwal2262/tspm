@@ -1,6 +1,8 @@
 # ADR 0001: protected Android baseline snapshot
 
-**Status:** accepted by owner on 2026-10-09; native guarantees verified on Android API 33.
+**Status:** accepted by owner on 2026-10-09. Fresh API 24/33 storage and host-driven
+process-interruption gates passed 9 October; app acceptance completed 13 October
+(see [verification report](../specs/tspm-sprint-1-verification.md)).
 **Date:** 2026-10-07.
 **Scope:** [Sprint 1 technical sketch](../specs/tspm-sprint-1-technical-plan.md),
 criteria 8, 9, 11 and 12.

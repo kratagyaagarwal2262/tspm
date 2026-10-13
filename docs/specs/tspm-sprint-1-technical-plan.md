@@ -1,6 +1,11 @@
 # Sprint 1 technical sketch: onboarding and recoverable baseline
 
-**Status:** approved by owner on 2026-10-09; implementation in progress. **Plan date:** 2026-10-07.
+**Status:** approved by owner on 2026-10-09; implemented and emulator-verified 2026-10-13. **Plan date:** 2026-10-07.
+
+Section 9 records the approved continuation from `e670171`; slices A–E are complete.
+The [verification report](tspm-sprint-1-verification.md) records current evidence,
+review fixes, default-route promotion and proof limits. Planning statements below
+describe the evidence available when the plan was accepted, not current blockers.
 
 Behavior source: [Sprint 1 criteria 1–14](tspm-sprint-1.md), refined by the
 [confirmed blueprint](tspm-product-plan.md). Conventions:
@@ -14,10 +19,10 @@ integrates it with inspection of the actual app and installed Android plugin.
 |---|---|
 | State | `lib/features/counter/bloc/counter_bloc.dart` uses BLoC with event/state parts and Equatable. Retain that pattern. |
 | Injection | Counter constructs its BLoC locally. Product page owns one repository and BLoC through constructor injection; no service locator. |
-| Serialization | No persisted models exist. Use hand-written JSON with checked parsing and stable string tokens, not enum indexes or code generation. |
-| Repository returns | The project table marks nullable reads as planned. They cannot distinguish absence from read failure. Use `Either<BaselineFailure, BaselineSnapshot?>` here; null means verified absence only. |
+| Serialization | Implemented in `BaselineCodec`: hand-written, versioned JSON with checked parsing and stable string tokens, not enum indexes or code generation. |
+| Repository returns | Implemented `Either<BaselineFailure, BaselineSnapshot?>` distinguishes verified absence from failure, as accepted in ADR 0002. |
 | Navigation | Extend `AppRouter.onGenerateRoute` and `AppRoutes`; preserve counter and unknown-route behavior. |
-| UI reuse | Reuse `AppTheme`, `AppSystemUi`, `AppDimensions`, `AppTextStyles` and `AppStrings`. `core/components`, `utils`, `services`, `models`, `repositories` and `error` contain no implementations to reuse. Use themed Material controls, private widgets and native date/time dialogs. |
+| UI reuse | Reuse `AppTheme`, `AppSystemUi`, `AppDimensions`, `AppTextStyles`, `AppStrings` and existing `baseline_presentation.dart`. Core contains the implemented protected store bridge; no shared component suite exists. Use themed Material controls, private widgets and native date/time dialogs. |
 | Imports | Runtime Dart files use `lib/core/router/exports.dart`; BLoC parts use `part of`. Export new files and needed SDK libraries through the existing barrel. |
 | Tests | `flutter_test` is used now; `bloc_test` and `mocktail` are installed. Inject the storage channel for unit tests; real native persistence still needs Android checks. |
 | Platform | Android only. Installed Flutter resolves the current minimum to API 24, as recorded in project configuration. The proposal's API 23 sentence is stale; do not lower the minimum as part of this work. |
@@ -35,7 +40,10 @@ because this increment chooses no physiological or statistical method.
 
 ## 2. Owned files and boundaries
 
-Paths below are proposed implementation files, not generated scaffolding.
+The responsibility boundaries below are approved and implemented at checkpoint
+`e670171`. Continue the existing files rather than regenerating scaffolding.
+Private helper names in the original sketch describe responsibilities, not a
+requirement to rename working helpers.
 
 | Files | Responsibility |
 |---|---|
@@ -47,13 +55,15 @@ Paths below are proposed implementation files, not generated scaffolding.
 | `lib/features/baseline/bloc/baseline_bloc.dart` plus `baseline_event.dart`, `baseline_state.dart` parts | Loading, editing, persistence acknowledgments, confirmation, completion and retry. |
 | `lib/features/baseline/view/baseline_page.dart` | Product route, BLoC lifetime, lifecycle/back handling and five private step widgets. |
 | `lib/features/baseline/view/baseline_landing_page.dart`, `baseline_profile_page.dart` | Honest completion landing and saved-profile inspection. Profile receives a committed immutable bundle; no second BLoC. |
+| `lib/features/baseline/widget/baseline_presentation.dart` | Existing feature reading layout, review rows and original-offset timestamp formatting. |
 | `lib/core/services/protected_baseline_store.dart` | Concrete MethodChannel adapter; no storage interface with a single production implementation. |
 | `android/app/src/main/kotlin/com/example/tspm/ProtectedBaselineStore.kt` | Platform encryption and atomic file read/replace on one background executor. |
 | Existing `MainActivity.kt` | Register/dispose the channel; avoid putting persistence bodies in the activity. |
 | Existing `lib/core/router/{app_routes,app_router,exports}.dart`, `lib/main.dart` | Route registration, exports and explicit injectable initial-route choice. |
 | Existing `lib/core/constants/app_strings.dart` | Product, validation, privacy, save/retry and unknown-value copy. Extend dimensions only for an actual layout need. |
-| `test/features/baseline/{model,repo,bloc,widget}/` | Criterion-focused tests at the matching seam. |
-| `android/app/src/androidTest/kotlin/com/example/tspm/ProtectedBaselineStoreTest.kt` and `android/app/build.gradle.kts` if needed | Real native storage round-trip/failure tests and minimum Android test-runner configuration. |
+| `test/features/baseline/{model,repo,bloc,view}/` and `test/navigation_test.dart` | Criterion-focused tests at the matching seam; widget tests live in `view/`. |
+| `android/app/src/androidTest/kotlin/com/example/tspm/{ProtectedBaselineStoreTest,ProtectedBaselineProcessTest}.kt` and `android/app/build.gradle.kts` | Existing native storage tests, host-driven interruption scenarios and test-runner configuration. |
+| `integration_test/baseline_test.dart`, `test_driver/baseline_driver.dart`, `scripts/baseline_device_doctor.sh` | Existing disposable-device draft/completion/review phases, screenshots and preflight. |
 | Existing `test/widget_test.dart` | Keep counter/theme coverage explicit when app startup becomes injectable. |
 | `docs/specs/tspm-sprint-1-verification.md` | Actual check results, emulator evidence and promotion decision at implementation close. |
 
@@ -65,8 +75,8 @@ types remain private in the Kotlin storage file. Do not create a file per enum.
 
 The following are declarations/signatures only, not method implementations.
 `get` notation describes immutable fields; constructors are omitted where they
-would only repeat the table. Validated record constructors are private to their
-model library; parsing/completion factories enforce the invariants.
+would only repeat the table. Implemented record constructors validate their
+invariants; decoding/completion factories validate complete record combinations.
 
 ### Primitive choices and provenance
 
@@ -315,7 +325,7 @@ explicit migrations and preservation tests. See [ADR 0002](../adr/0002-baseline-
 ## 4. Protected storage and repository signatures
 
 ```dart
-final class ProtectedBaselineStore {
+class ProtectedBaselineStore {
   ProtectedBaselineStore({MethodChannel? channel});
   Future<String?> read();
   Future<void> replace({required String? expectedJson, required String nextJson});
@@ -418,7 +428,7 @@ final class BaselineBackPressed extends BaselineEvent {}
 final class BaselineOutlierAnswered extends BaselineEvent {
   OutlierField get field; double get canonicalValue; bool get accepted;
 }
-final class BaselineFlushRequested extends BaselineEvent {}
+final class BaselineFlushRequested extends BaselineEvent { Completer<bool> get completer; }
 final class BaselineCompletePressed extends BaselineEvent {}
 final class BaselineRetryPressed extends BaselineEvent {}
 // Internal completion message; never dispatched by a widget.
@@ -437,6 +447,7 @@ final class BaselineEditing extends BaselineState {
   int get persistedRevision;
   bool get saving;
   BaselineFailure? get saveFailure;
+  bool get confirmationPending;
 }
 final class BaselineCompleting extends BaselineState {
   OnboardingDraft get draft;
@@ -452,6 +463,7 @@ final class BaselineCompleted extends BaselineState {
 
 final class BaselineBloc extends Bloc<BaselineEvent, BaselineState> {
   BaselineBloc({required BaselineRepository repository, DateTime Function()? now});
+  Future<bool> flush();
 }
 ```
 
@@ -465,8 +477,10 @@ ordered; no extra debounce package or reliance on a lifecycle-only save.
 
 `persistedRevision == draft.revision` means current answers were acknowledged.
 Show Saving or Unsaved/Retry otherwise. Next validates its step and saves the
-new step/revision; Back saves the earlier step. Process death resumes the last
-acknowledged revision, never a falsely claimed latest save. Flush on lifecycle
+new step/revision; Back saves the earlier step. Process death reloads the last
+valid committed snapshot, which may include a replace whose acknowledgment was
+lost. Recovery is promised for acknowledged edits; pending files are never
+promoted. Never falsely label an unacknowledged edit saved. Flush on lifecycle
 inactive/paused and route exit, but continuously saved edits provide recovery
 when Android gives no final callback. Process death during unacknowledged typing
 may lose those edits; the UI must show that they are still being saved.
@@ -492,27 +506,30 @@ state; decline changes no numeric answer. No platform access from BLoC.
 
 ```dart
 BaselinePage({BaselineRepository? repository, Key? key})
-BaselineLandingPage({required CompletedBaseline baseline, required VoidCallback onReviewProfile, Key? key})
+BaselineLandingPage({required CompletedBaseline baseline, required VoidCallback onReviewProfile,
+  bool justCompleted = false, Key? key})
 BaselineProfilePage({required CompletedBaseline baseline, Key? key})
 ProfileRouteArgs({required CompletedBaseline baseline})
-_BaselineFormHost({required BaselineEditing state, Key? key})
+_BaselineHost()
 
 // Private stateless presentation widgets inside baseline_page.dart:
-_OnboardingShell({required OnboardingStep step, required Widget child,
-  required VoidCallback onBack, required VoidCallback onNext,
-  required bool saving, required bool canAdvance, required Widget saveStatus})
-_PurposeAndUnitsStep({required OnboardingDraft draft, required ValueChanged<UnitPreferences> onChanged})
+_PurposeAndUnitsStep({required OnboardingDraft draft, required ValueChanged<UnitPreferences> onUnitsChanged})
 _RequiredBaselineStep({required OnboardingDraft draft, required FormProblems problems,
-  required ValueChanged<OnboardingDraft> onChanged, required VoidCallback onEditTime})
+  required TextEditingController Function(OnboardingField) controllerFor,
+  required void Function(OnboardingDraft Function(OnboardingDraft)) onEdit,
+  required VoidCallback onEditTime})
 _MeasurementsStep({required OnboardingDraft draft, required FormProblems problems,
-  required ValueChanged<OnboardingDraft> onChanged})
+  required TextEditingController Function(OnboardingField) controllerFor,
+  required void Function(OnboardingDraft Function(OnboardingDraft)) onEdit})
 _ActivityStep({required OnboardingDraft draft, required FormProblems problems,
-  required ValueChanged<OnboardingDraft> onChanged})
+  required TextEditingController Function(OnboardingField) controllerFor,
+  required void Function(OnboardingDraft Function(OnboardingDraft)) onEdit})
 _GoalAndApplicabilityStep({required OnboardingDraft draft, required FormProblems problems,
-  required ValueChanged<OnboardingDraft> onChanged})
+  required TextEditingController Function(OnboardingField) controllerFor,
+  required void Function(OnboardingDraft Function(OnboardingDraft)) onEdit})
 ```
 
-A private `_BaselineFormHost` StatefulWidget with `_BaselineFormHostState`
+The implemented private `_BaselineHost` StatefulWidget with `_BaselineHostState`
 owns/disposes text controllers and the lifecycle observer. It passes values and
 callbacks to the stateless step layouts and
 synchronizes restored/unit-converted text without moving the cursor on save-only
@@ -564,7 +581,7 @@ Do not call a mocked channel test proof of encrypted Android persistence.
 | 1. Model/codec | Raw incomplete/invalid draft round-trips; committed records validate; goal variants, units and original day/offset are retained. | Rung 2: `flutter test test/features/baseline/model/`; test kg/lb/cm/in toggles without canonical drift, exact threshold edges, edit invalidation, unknown/zero distinction, date normalization, schema corruption/version cases. Criteria 2–7, 12 at domain seam. |
 | 2. Native store/repository | Durable encrypted draft survives process restart; one completion snapshot replaces it; I/O/key/corruption failures preserve records and input. No product UI is required to demonstrate it. | Rung 2 repository tests plus native instrumentation on disposable Android emulator. Test file/directory sync, rename and verification failures, interruption before/after replacement, missing key, inaccessible parent, corrupt bytes, expected-value conflict, late draft and identical completion retry. Inspect disk for absence of plaintext. Criteria 8, 9, 11, 12. Stop here if native guarantees fail; amend ADR/plan before feature UI. |
 | 3. BLoC | Load/resume, optimistic editing, latest-revision acknowledgments, back/next, confirmation and frozen completion/retry can be driven directly. | Rung 2: `flutter test test/features/baseline/bloc/`; include out-of-order acknowledgments, background flush, duplicate complete taps and failures that retain input. Criteria 1–9, 12. |
-| 4. UI/routes | All five steps, landing, typed Profile and explicit counter route are functional without fake data. | Rung 3: `flutter test test/features/baseline/widget/`; required/optional flows, both goals, applicability yes/unknown, warnings/decline, saved/unsaved copy, back, landing/profile, both themes, 200% text, keyboard reachability and semantics. Existing `flutter test` suite protects counter/theme/system bars. Criteria 1–14 at widget seam. |
+| 4. UI/routes | All five steps, landing, typed Profile and explicit counter route are functional without fake data. | Rung 3: `flutter test test/features/baseline/view/`; required/optional flows, both goals, applicability yes/unknown, warnings/decline, saved/unsaved copy, back, landing/profile, both themes, 200% text, keyboard reachability and semantics. Existing `flutter test` suite protects counter/theme/system bars. Criteria 1–14 at widget seam. |
 | 5. Device acceptance | Product route boots offline, resumes real stored answers after force-stop and preserves time provenance after zone change. Storage errors and accessibility work on Android. | Device-level evidence: boot/run on Android emulator, airplane mode, mid-flow force-stop/relaunch after Saved, completed reopen, duplicate completion, timezone change, native failure scenarios, both themes/200% text, TalkBack and reduced-motion review. Record screenshots/scenario results and native test output. Criteria 1–14 in the integrated app. |
 | 6. Promote only after pass | Product becomes startup default; explicit counter remains runnable. | Repeat full `flutter analyze`, `flutter test`, format check and startup/counter device smoke after this routing change. Record promotion in verification report. No promotion while persistence/device acceptance is unproven. |
 
@@ -574,8 +591,8 @@ with its driver in `test_driver/`; Android instrumentation is in
 are separate evidence from the Flutter integration run. Use `flutter devices`,
 `flutter run -d <emulator-id>` and the actual Gradle
 connected-test task/device selected during implementation; record exact commands
-then. An automated Flutter integration harness can be added only if selected work
-requires it; it is not scaffolded by this planning pass. There is no approved
+then. Extend the existing harness only where an acceptance gap requires it.
+There is no approved
 pixel baseline, so rung 4 goldens are not a completion claim.
 
 ## 8. Subtraction, decisions and review
@@ -616,9 +633,9 @@ attempt was blocked by SDK-cache sandbox access; the approved retry completed.
 These are the existing counter/theme baseline only. No Sprint 1 implementation,
 native instrumentation, format command or emulator scenario was run in this pass.
 
-Implementation is in progress. Use this sketch to finish the planned verification
-sequence; the current results and remaining emulator storage constraint are in
-`tspm-sprint-1-verification.md`.
+At the planning checkpoint implementation was in progress. The continuation
+completed the sequence; current results and resolved emulator storage constraint
+are recorded in `tspm-sprint-1-verification.md`.
 
 ## Implementation refinements (9 October 2026)
 
@@ -626,3 +643,87 @@ sequence; the current results and remaining emulator storage constraint are in
 - The initial goal takes effect on the completion local day. A backdated starting observation retains its independent day/instant/offset; age recording also uses the completion day.
 - Directory validation uses public `Os.fstat`/`S_ISDIR`; file opens avoid `O_CLOEXEC`, whose public field appeared after API 24. Native Android lint checks the actual minimum.
 - The Flutter SDK integration harness exercises disposable local-only Android data. No backend, staging account, credentials or external startup gates exist. Device evidence and remaining limitations are recorded separately.
+
+## 9. Approved build sequence from `e670171` (completed)
+
+Scope and ADR choices are unchanged. Work on `codex/sprint-1-next`. Implement
+only the focused gaps below, then establish the missing evidence; do not rebuild
+the existing models, repository or screens. The original 21-point estimate is
+not a fresh estimate of remaining work.
+
+| Slice | Owned files / responsibility | Verifiable stopping point |
+|---|---|---|
+| A. Timestamp and harness corrections | `baseline_validation.dart`, `baseline_page.dart` and focused model/view tests; `integration_test/baseline_test.dart` | Before storing a selected local date/time, compare the resolved DateTime components with the requested components. Reject normalized nonexistent DST clocks with field feedback. Preserve the accepted resolved-offset behavior for repeated clocks. The harness accepts only `draft`, `complete`, `review` and fails on unknown phases. Rungs 2–3 for date behavior, rung 5 for driver phases. |
+| B. Native acceptance | Existing Android instrumentation and disposable emulator configuration; verification report | Reproduce storage test results against the build under review. Drive process-boundary scenarios separately (below); confirm acknowledged-save/restart, encrypted bytes, failure preservation and expected-value conflicts. Compile/lint and mocked channels are insufficient proof. |
+| C. Real app completion/reopen | Existing integration test/driver, only extending scenario coverage as needed | Draft survives host force-stop, saved time/day/offset survives timezone change, both goal paths complete, omitted inputs/applicability stay unknown, duplicate taps do not duplicate records, reopen reaches landing/Profile. Rung 5, with screenshots and stored-record assertions. |
+| D. Device interaction and accessibility | Existing baseline views/widgets and focused tests only where checks fail | Airplane mode; Android back/background/exit failure; keyboard reachability; all five steps, landing and Profile at 200% text in both themes; TalkBack order/labels; reduced-motion feedback. Record each result, not only a suite count. |
+| E. Default-route promotion | `lib/main.dart`, `lib/core/router/app_router.dart`, startup/counter/theme tests | Only after applicable gates pass, make the product the startup default and keep `/counter` explicit. Existing counter/theme tests select `AppRoutes.counter`; new default-startup tests cover verified absence, saved draft, completed snapshot and read failure. Rerun static/unit/widget checks and device startup/counter smoke. |
+
+Dependencies: A → C; B → C; C and D → E. A and B can be worked independently.
+Any failure gets a criterion-linked regression check at the cheapest suitable
+seam before fixing it. Each slice reports its actual rung; there is no approved
+golden baseline. No new repository interface, storage framework, health method
+or shared component suite is introduced by this continuation.
+
+The only planned new domain helper belongs in `BaselineValidation`; reuse the
+existing `InputIssue.invalidDateTime` rather than adding another error type:
+
+```dart
+static Either<InputIssue, ObservationTime> validateSelectedTime({
+  required LocalDay selectedDay,
+  required int hour,
+  required int minute,
+  required DateTime resolvedLocal,
+});
+```
+
+Its inputs preserve what the picker requested before DateTime normalization.
+The view resolves the local DateTime and invokes the helper before dispatching
+a draft update. A failure retains the previous saved timestamp and shows local
+field feedback using the existing invalid-time copy; a valid selection clears
+that feedback and uses the current immutable draft-update event. The transient
+picker error belongs to the form host, with no new persisted fields, schema
+version or BLoC event. Unit tests can supply matching/mismatching resolved clock
+components without depending on the host timezone; a real DST-zone device
+scenario proves platform normalization handling.
+
+### Native process scenarios
+
+Use the existing `ProtectedBaselineProcessTest` with an explicit `scenario`
+instrumentation argument. A normal connected-test run skips it and does not prove
+process-death behavior. Drive these as separate host invocations, preserving the
+same app installation, test directory and key between invocations:
+
+1. `prepare` → `interruptBeforeRename` → `verifyOld`.
+2. `prepare` → `interruptAfterRename` → `verifyNew`.
+3. `prepare` → host force-stop/restart → `verifyAcknowledged`.
+
+The intentional process kill interrupts the middle runner invocation; success
+comes from the following verifier reading the expected complete snapshot.
+The first two scenarios prove old-or-new integrity across interruption, and the
+third checks an acknowledged save in a new process. Ordinary storage tests cover
+the distinct sync/rename/verification error paths.
+
+At plan acceptance, historical API 33 output recorded 11 storage-test passes and
+one skipped process test; it did not prove these scenarios. API 24 had no local
+device-run evidence or installed image. Provision a disposable API 24 image during build work
+when available and run the accepted minimum-platform checks. Record unavailable
+coverage explicitly; a missing image is not a pass or permission to lower the
+minimum. Do not silently waive an accepted storage gate.
+
+### Preserve data between Flutter phases
+
+Provide enough emulator space for APK updates before starting. Run `draft` only
+with verified empty protected storage. After its saved acknowledgment, force-stop
+and continue with `complete`, then restart into `review`, using the same app data.
+Timezone/offline changes happen around these host-driven boundaries. A phase
+replacement that uninstalls the app invalidates the recovery scenario; record
+that run as blocked and restart on a fresh disposable emulator. Never reset real
+user data to make the driver pass.
+
+### Hand off
+
+No new product question or architecture choice needs owner approval. The remaining
+work is implementation correction and proof against the accepted criteria.
+This `/fk-build` continuation completed on 13 October 2026. Consult the verification
+report before expanding scope; preserved ADR choices and schema remain unchanged.

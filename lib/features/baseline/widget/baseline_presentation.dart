@@ -1,4 +1,4 @@
-import '../../../core/router/exports.dart';
+import 'package:tspm/core/router/exports.dart';
 
 /// Formats the original observation clock, independent of the current timezone.
 String baselineTimeLabel(ObservationTime time) {

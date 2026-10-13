@@ -49,6 +49,22 @@ final class FormProblems extends Equatable {
 }
 
 abstract final class BaselineValidation {
+  static Either<InputIssue, ObservationTime> validateSelectedTime({
+    required LocalDay selectedDay,
+    required int hour,
+    required int minute,
+    required DateTime resolvedLocal,
+  }) {
+    if (resolvedLocal.year != selectedDay.year ||
+        resolvedLocal.month != selectedDay.month ||
+        resolvedLocal.day != selectedDay.day ||
+        resolvedLocal.hour != hour ||
+        resolvedLocal.minute != minute) {
+      return left(InputIssue.invalidDateTime);
+    }
+    return right(ObservationTime.fromSelectedLocal(resolvedLocal));
+  }
+
   static FormProblems checkStep(OnboardingDraft draft) {
     final issues = <OnboardingField, InputIssue>{};
     var badTime = false;

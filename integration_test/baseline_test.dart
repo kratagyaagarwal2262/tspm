@@ -6,12 +6,17 @@ import 'package:tspm/main.dart';
 // Run only on a disposable Android emulator. Phases intentionally retain real
 // storage across host force-stop/time-zone changes; there is no reset operation.
 void main() {
-  final IntegrationTestWidgetsFlutterBinding binding =
-      IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   const String phase = String.fromEnvironment(
     'BASELINE_PHASE',
     defaultValue: 'draft',
   );
+  if (!const {'draft', 'complete', 'review'}.contains(phase)) {
+    throw ArgumentError.value(phase, 'BASELINE_PHASE', 'Unknown test phase');
+  }
+  final IntegrationTestWidgetsFlutterBinding binding =
+      IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  const bool loss = bool.fromEnvironment('BASELINE_LOSS');
+  const bool dark = bool.fromEnvironment('BASELINE_DARK');
 
   testWidgets('AC 1–14: real protected baseline ($phase)', (
     WidgetTester tester,
@@ -23,7 +28,12 @@ void main() {
         .load();
     expect(before.isRight(), isTrue);
     if (phase == 'draft') expect(_snapshotOrNull(before), isNull);
-    await tester.pumpWidget(const MyApp(initialRoute: AppRoutes.product));
+    await tester.pumpWidget(
+      const MyApp(
+        initialRoute: AppRoutes.home,
+        themeMode: dark ? ThemeMode.dark : ThemeMode.light,
+      ),
+    );
     await _waitFor(
       tester,
       () => find.byType(CircularProgressIndicator).evaluate().isEmpty,
@@ -92,7 +102,11 @@ void main() {
         find.byKey(const ValueKey<OnboardingField>(OnboardingField.goalWeight)),
         findsNothing,
       );
-      await _choose(tester, AppStrings.pregnancy, AppStrings.yes);
+      if (loss) {
+        await _choose(tester, AppStrings.goalIntent, AppStrings.loss);
+      } else {
+        await _choose(tester, AppStrings.pregnancy, AppStrings.yes);
+      }
       expect(find.text(AppStrings.applicabilityLimited), findsOneWidget);
       await shot('goal');
       final Finder finish = find.text(AppStrings.finishSetup);
@@ -113,9 +127,19 @@ void main() {
       expect(baseline.profile.typicalDailySteps, isNull);
       expect(baseline.profile.activityLevel, isNull);
       expect(baseline.profile.reportedBodyFat, isNull);
-      expect(baseline.profile.pregnancy, ApplicabilityAnswer.yes);
+      expect(
+        baseline.profile.pregnancy,
+        loss ? ApplicabilityAnswer.unknown : ApplicabilityAnswer.yes,
+      );
       expect(baseline.profile.breastfeeding, ApplicabilityAnswer.unknown);
-      expect(baseline.goal, isA<MaintenanceGoal>());
+      if (loss) {
+        expect(baseline.goal, isA<LossGoal>());
+        final LossGoal goal = baseline.goal as LossGoal;
+        expect(goal.targetWeightKg, closeTo(160 * 0.45359237, 1e-10));
+        expect(goal.rate, LossRate.quarterPercent);
+      } else {
+        expect(baseline.goal, isA<MaintenanceGoal>());
+      }
       expect(
         {
           baseline.profile.metadata.id,
@@ -144,10 +168,7 @@ void main() {
       findsOneWidget,
     );
     await shot('profile');
-    await tester.drag(
-      find.byType(SingleChildScrollView),
-      const Offset(0, -900),
-    );
+    await tester.ensureVisible(find.text(AppStrings.applicabilityLimited));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
     await shot('profile-goal');

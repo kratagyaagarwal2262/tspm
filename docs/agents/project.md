@@ -35,7 +35,7 @@ Project facts read by the Flutter Engineering Kit skills. Update this file when 
 | Widget-test wrapper | `MyApp` for app and route tests; `BlocProvider<BaselineBloc>` on the baseline route |
 | Dependency injection | `BaselinePage` accepts a repository and creates one BLoC; counter page creates its BLoC directly |
 | Serialization | Hand-written strict, versioned JSON in `BaselineCodec` (`lib/features/baseline/model/baseline_snapshot.dart`) |
-| Navigation | `AppRouter.onGenerateRoute` |
+| Navigation | `AppRouter.onGenerateRoute`; `/` and `/product` open baseline, `/counter` preserves counter. `MyApp.onGenerateInitialRoutes` creates one initial route/storage gate. |
 | Data return contract | Baseline reads `Future<Either<BaselineFailure, BaselineSnapshot?>>`; writes return `Either<BaselineFailure, Snapshot>`. Only a successful read may report absence (`lib/features/baseline/repo/baseline_repository.dart`) |
 | Sizing strategy | Logical-pixel `AppDimensions` and unscaled `AppTextStyles`; adaptive breakpoints are planned for product layouts |
 | Theme | `AppTheme.light` / `AppTheme.dark` in `lib/core/theme/`; explicit light default in `MyApp`; Material 3; typed `AppChartTheme` chart colors |
@@ -50,11 +50,11 @@ Project facts read by the Flutter Engineering Kit skills. Update this file when 
 | Project memory | `docs/vault/`; start with `index.md` and `memory.md` |
 | Project scope and delivery roadmap | `docs/vault/proposal.md` (revision 1 draft for review; confirmed product blueprint remains the behavior source) |
 | Phase 1 / Sprint 1 | `docs/specs/tspm-sprint-1.md` (onboarding and recoverable local profile; two-week cadence and scope choices confirmed 7 October 2026) |
-| Sprint 1 technical sketch | `docs/specs/tspm-sprint-1-technical-plan.md` (owner-approved 9 October 2026; implementation in progress; see ADRs 0001–0002) |
+| Sprint 1 technical sketch | `docs/specs/tspm-sprint-1-technical-plan.md` (owner-approved 9 October 2026; implemented and emulator-verified 13 October; see ADRs 0001–0002) |
 | Sprint 1 verification | `docs/specs/tspm-sprint-1-verification.md` |
-| Domain glossary | `CONTEXT.md` (create when domain terms are settled) |
+| Domain glossary | `CONTEXT.md` |
 | Architecture decisions | `docs/adr/` |
-| Design language | `docs/agents/design.md` (settled direction and proposed visual defaults; device review pending) |
+| Design language | `docs/agents/design.md` (settled direction; Sprint 1 emulator geometry/theme/accessibility checked, no approved pixel baseline) |
 | Visual exploration and detailed brief | `docs/specs/tspm-design-exploration.md`; current concept in `docs/design/tspm-visual-data-directions.html` (burgundy/sand selected; visual-first composition review pending); original alternatives retained in `docs/design/tspm-design-directions.html` |
 | Product plan and acceptance criteria | `docs/specs/tspm-product-plan.md` (confirmed product handoff; release scope source) |
 | Product vision | `docs/specs/product-vision.md` (draft; not implementation acceptance criteria) |
@@ -63,9 +63,9 @@ Project facts read by the Flutter Engineering Kit skills. Update this file when 
 
 | Field | Value |
 |---|---|
-| Integration harness | `integration_test/baseline_test.dart` with `test_driver/baseline_driver.dart`; Android native instrumentation under `android/app/src/androidTest/` |
+| Integration harness | `integration_test/baseline_test.dart` (draft/complete/review, optional dark/loss flags) and `baseline_time_test.dart` (unfinished draft, New York DST picker), with `test_driver/baseline_driver.dart`. Native storage/process tests and opt-in `BaselineAccessibilityTest` under `android/app/src/androidTest/`. Use disposable local-only Android data. |
 | Known test baseline | Before theme foundation: `flutter test` passed (+1, -0). |
-| Current verified checks | 9 October 2026: `flutter analyze` clean; `flutter test` +64, -0; Dart formatting clean; Android instrumentation compilation and `lintDebug` pass; Pixel Tablet API 35 draft integration phase passed and saved screenshots. Completion phase remains unverified because updating the APK ran out of emulator space. See `docs/specs/tspm-sprint-1-verification.md` |
+| Current verified checks | 13 October 2026: analyzer clean; `TZ=America/New_York flutter test` +97, zero failures/skips; format 44 files, none changed; native test compile/lint passed. Fresh API 24/33 storage and host process sequences passed 9 October; real completion/reopen/offline flows passed both APIs. API 33 native accessibility/Back-save failure/DST and promoted default/counter smoke passed 13 October. Reviews: zero actionable findings. Full counts, dates and proof limits in `docs/specs/tspm-sprint-1-verification.md`. |
 | Commands | `flutter pub get`; `dart format .`; `flutter analyze`; `flutter test` |
 
 The app has no API, authentication, analytics, push, maps, or payment integrations yet. Do not infer them from the starter scaffold.
@@ -73,11 +73,12 @@ The app has no API, authentication, analytics, push, maps, or payment integratio
 ## Sprint 1 setup boundary
 
 Use `docs/specs/tspm-sprint-1.md` for the five-step onboarding, recoverable draft,
-protected local profile, minimal landing and profile-review criteria. Its implementation is
-in progress under `lib/features/baseline/` and `lib/core/services/protected_baseline_store.dart`;
-Android storage is implemented in `ProtectedBaselineStore.kt`. The Pixel Tablet draft phase passed,
-but completion and remaining device acceptance are pending because the emulator lacked space to
-update the integration APK. Preserve the counter route.
+protected local profile, minimal landing and profile-review criteria. Implementation under
+`lib/features/baseline/` and `lib/core/services/protected_baseline_store.dart` is emulator-verified;
+Android storage is implemented in `ProtectedBaselineStore.kt`. Disposable emulators with enough
+space closed the earlier APK-update blocker. Product is now the startup default; preserve
+the explicit counter route. Physical-device, audible TalkBack and approved-golden proof remain
+unavailable; consult the verification report rather than inferring those from emulator results.
 No API, fixture health data, logging, charts, backups or numerical estimates are added in Sprint 1.
 
 Design is written-spec based; no Figma node or API contract exists. Reuse the existing shared

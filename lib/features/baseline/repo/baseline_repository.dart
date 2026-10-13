@@ -87,6 +87,8 @@ final class BaselineRepository {
     BaselineOperation operation,
   ) async {
     bool replacing = false;
+    bool readSucceeded = false;
+    bool completionStored = false;
     try {
       final String next = BaselineCodec.encode(candidate);
       final Either<BaselineFailure, BaselineSnapshot> checked =
@@ -98,6 +100,7 @@ final class BaselineRepository {
         );
       }
       final String? raw = await _store.read();
+      readSucceeded = true;
       if (raw != null) {
         final Either<BaselineFailure, BaselineSnapshot> decoded =
             BaselineCodec.decode(raw);
@@ -111,6 +114,7 @@ final class BaselineRepository {
         );
         bool conflict = current.setupId != candidate.setupId;
         if (current is CompletedBaselineSnapshot) {
+          completionStored = true;
           conflict =
               conflict ||
               candidate is! CompletedBaselineSnapshot ||
@@ -128,7 +132,10 @@ final class BaselineRepository {
             BaselineFailure(
               operation: operation,
               reason: BaselineFailureReason.conflict,
-              writeOutcome: WriteOutcome.notCommitted,
+              writeOutcome:
+                  operation == BaselineOperation.complete && completionStored
+                  ? WriteOutcome.unknown
+                  : WriteOutcome.notCommitted,
             ),
           );
         }
@@ -138,6 +145,18 @@ final class BaselineRepository {
       return Right(candidate);
     } on Object catch (error) {
       final BaselineFailure failure = _failure(error, operation);
+      // A failed retry cannot rule out an earlier completion or acknowledge it.
+      if (operation == BaselineOperation.complete &&
+          (!readSucceeded || completionStored)) {
+        return Left(
+          BaselineFailure(
+            operation: operation,
+            reason: failure.reason,
+            unsupportedVersion: failure.unsupportedVersion,
+            writeOutcome: WriteOutcome.unknown,
+          ),
+        );
+      }
       return Left(
         replacing
             ? failure

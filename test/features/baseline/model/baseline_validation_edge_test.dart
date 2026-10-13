@@ -31,6 +31,40 @@ OnboardingDraft validDraft() =>
         );
 
 void main() {
+  group('AC 6: selected clock must survive platform resolution', () {
+    test('rejects a nonexistent clock normalized into a later hour', () {
+      final result = BaselineValidation.validateSelectedTime(
+        selectedDay: LocalDay.parse('2026-03-08'),
+        hour: 2,
+        minute: 30,
+        resolvedLocal: DateTime(2026, 3, 8, 3, 30),
+      );
+      expect(result, left(InputIssue.invalidDateTime));
+    });
+    test('rejects resolution into another calendar day and invalid clocks', () {
+      for (final hour in [23, 24, -1]) {
+        expect(
+          BaselineValidation.validateSelectedTime(
+            selectedDay: LocalDay.parse('2026-03-08'),
+            hour: hour,
+            minute: 30,
+            resolvedLocal: DateTime(2026, 3, 9, 0, 30),
+          ),
+          left(InputIssue.invalidDateTime),
+        );
+      }
+    });
+    test('matching selection retains the resolved instant, day and offset', () {
+      final resolved = DateTime(2026, 11, 1, 1, 30);
+      final result = BaselineValidation.validateSelectedTime(
+        selectedDay: LocalDay.parse('2026-11-01'),
+        hour: 1,
+        minute: 30,
+        resolvedLocal: resolved,
+      );
+      expect(result, right(ObservationTime.fromSelectedLocal(resolved)));
+    });
+  });
   group('AC 2–6: validation remains safe through corrections and reload', () {
     test(
       'decimal age text cannot pass validation then throw during completion',

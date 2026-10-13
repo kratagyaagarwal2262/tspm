@@ -1,10 +1,15 @@
 # TSPM Phase 1 / Sprint 1: onboarding and recoverable local profile
 
-**Status:** scope choices confirmed; acceptance handoff drafted · **Date:** 2026-10-07
+**Status:** scope confirmed; implementation and emulator acceptance completed 2026-10-13 · **Original date:** 2026-10-07
 
 **Start:** 9 October 2026, confirmed by owner. **Duration:** two weeks. **Estimate:** 21 points, provisional. **Review:** Android emulator demo against the numbered criteria below.
 
 Sources: [project proposal, revision 1](../vault/proposal.md), [confirmed product blueprint](tspm-product-plan.md), [design language](../agents/design.md), and [project configuration](../agents/project.md).
+
+Outcome: product onboarding is the startup default and the explicit counter route remains.
+[Verification](tspm-sprint-1-verification.md) maps criteria 1–14 to actual checks,
+device dates and limits; physical-device, audible TalkBack and approved pixel-baseline
+reviews are not claimed.
 
 ## Goal and boundary
 
@@ -54,8 +59,66 @@ Criteria 1–14 refine blueprint criteria 1, 2, 8, 16, 17 and 18 for this increm
 
 Later sprint estimates and stories are selected at the preceding sprint close. Sprint 1 does not scaffold all future record families or build unused navigation destinations.
 
+## State contract
+
+These states apply to the numbered criteria above and retain the approved technical
+plan's recovery behavior. They add no new product scope.
+
+| Criteria | Loading or operation in progress | Empty or unanswered | Failure and next action |
+|---|---|---|---|
+| 1, 10 | Resolve protected storage before choosing onboarding or landing. A loaded landing remains visible during refresh. | Verified absence starts step 1; a saved draft resumes; a completed snapshot opens landing. No logs means no trend or numerical summary. | Failed initial read names the operation and offers Retry, without a writable replacement form. Failed refresh retains loaded content. |
+| 2, 3 | Validation is local; persistence uses the draft status in criterion 8. | Required answers block advancement with field messages. | Invalid input stays editable; declining confirmation preserves the value. Confirmations apply only to that exact value. |
+| 4–7 | Conversion and availability explanations are local; persistence uses criterion 8. | Optional answers stay unknown. Maintenance has no loss target/rate; unknown applicability stays explicit. | Supplied invalid optional values receive field messages. A body-fat value requires its reported source. Corrections never create another observation. |
+| 8 | Keep the form usable during saves; distinguish Saving, Saved and Unsaved. Saved means the acknowledged revision. | A new draft has unit defaults and unknown optional answers. | Retain edits and offer Retry. After a failed exit flush, permit staying or explicitly leaving with an unsaved warning. Reopening loads the last valid committed snapshot. Recovery is promised for acknowledged edits; uncommitted pending files are never promoted. |
+| 9 | Freeze the candidate and block duplicate submissions while committing. | Incomplete required answers remain in onboarding with validation messages. | A known uncommitted failure permits retry or correction. An uncertain outcome retains the candidate and requires reconciliation before editing; success requires acknowledgment. |
+| 11, 12 | Offline is normal operation, with no account or connection loading state. | Only verified absence means no saved records. | I/O, key, corruption and version errors are failures, never absence. Retry preserves data; reset and backup restoration are unavailable. |
+| 13, 14 | Labels, focus, reachable actions and reduced-motion feedback apply in every state. Counter increments are immediate. | Unknown values are labeled; a fresh counter starts at zero. | Large text keeps errors and recovery actions reachable. The counter works independently of baseline storage success. |
+
+## Testing decisions
+
+Retain the approved seams: model/codec validation and provenance; repository
+absence/failure and replace semantics; BLoC events/revisions/completion retry;
+page widgets and typed routes; the real Android store and app lifecycle.
+Mock channel tests prove Dart behavior, not encryption or native durability.
+
+Criteria 2–7 and state/repository portions of 8, 9 and 12 reach unit/state tests.
+Visible copy, validation and actions reach widget tests. Criteria 1, 5, 6 and
+8–14 additionally need integrated Android evidence for persistence, reopen,
+offline, system interaction and accessibility. No API or account blocks that
+evidence; use a disposable emulator with enough installation/update space.
+No approved pixel baseline exists, so goldens are not an acceptance claim.
+
+## Assumptions and open questions
+
+No unanswered product question blocks continuing the approved scope. The start
+is confirmed as 9 October 2026; 21 points remains a provisional estimate.
+Activity choices, positive loss-target validation, separate applicability answers
+and the displayed resolved DST offset are owner-approved defaults in the technical
+plan. Selecting the other occurrence of a repeated DST time is deferred. Native
+durability and accessible presentation require evidence, not assumptions of success.
+
+## Out of scope
+
+- Daily logging, History, charts, numerical estimates, calorie suggestions,
+  trend/confidence scores and progress percentages.
+- Profile editing after completion, backup/export/import, reset/delete-all,
+  accounts, sync and integrations.
+- Permanent consumer branding, store publication and a dashboard with illustrative data.
+- Additional record families for later sprints, selection of both occurrences
+  of a repeated DST time and sudden device-power-loss guarantees.
+
+## Continuation from the checkpoint
+
+The baseline models, protected store, repository, BLoC, five-step UI and review
+routes exist at checkpoint `e670171`. Continue on `codex/sprint-1-next`; resolve
+the remaining acceptance gaps rather than regenerating the feature. The approved
+[technical plan](tspm-sprint-1-technical-plan.md) specifies the remaining sequence;
+the [verification report](tspm-sprint-1-verification.md) owns actual evidence.
+
 ## Sprint close evidence
 
 Implementation verification must cover first run, all-optional-skipped completion, loss/maintenance selection, applicability unknown/yes, unit conversion, outlier confirmation, mid-flow process death, timezone preservation, duplicate completion, read/save failure and counter regression. Include Android emulator restart/offline scenarios, large text and screen-reader review. Run relevant formatting, analysis and tests and record actual outcomes; no check is claimed as run by this planning document.
 
-The concrete implementation plan should use `$flutter-plan-change`, then the available `$flutter-create-feature` workflow against these criteria. This document authorizes planning artifacts; implementation starts when the owner invokes it.
+Handoff: run `/fk-build` with this spec and `tspm-sprint-1-technical-plan.md` to
+continue the existing implementation and complete its acceptance gates. This
+planning pass changes documents only.

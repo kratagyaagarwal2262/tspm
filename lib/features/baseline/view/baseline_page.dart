@@ -1,4 +1,4 @@
-import '../../../core/router/exports.dart';
+import 'package:tspm/core/router/exports.dart';
 
 class BaselinePage extends StatelessWidget {
   const BaselinePage({super.key, this.repository});
@@ -24,6 +24,7 @@ class _BaselineHostState extends State<_BaselineHost>
   final Map<OnboardingField, TextEditingController> _controllers = {};
   bool _allowExit = false;
   bool _dialogOpen = false;
+  bool _invalidSelectedTime = false;
   @override
   void initState() {
     super.initState();
@@ -59,6 +60,15 @@ class _BaselineHostState extends State<_BaselineHost>
     }
     if (state is BaselineCompleting) return;
     bool saved = state is! BaselineEditing || await bloc.flush();
+    while (mounted && saved) {
+      final BaselineState latest = bloc.state;
+      if (latest is! BaselineEditing ||
+          (latest.persistedRevision >= latest.draft.revision &&
+              latest.saveFailure == null)) {
+        break;
+      }
+      saved = await bloc.flush();
+    }
     if (!mounted) return;
     if (!saved) {
       saved =
@@ -164,13 +174,26 @@ class _BaselineHostState extends State<_BaselineHost>
       initialTime: TimeOfDay(hour: selected.hour, minute: selected.minute),
     );
     if (!mounted || clock == null) return;
-    _edit(
-      (current) => current.withStartingTime(
-        ObservationTime.fromSelectedLocal(
-          DateTime(date.year, date.month, date.day, clock.hour, clock.minute),
-        ),
-      ),
+    final LocalDay selectedDay = LocalDay(
+      year: date.year,
+      month: date.month,
+      day: date.day,
     );
+    BaselineValidation.validateSelectedTime(
+      selectedDay: selectedDay,
+      hour: clock.hour,
+      minute: clock.minute,
+      resolvedLocal: DateTime(
+        date.year,
+        date.month,
+        date.day,
+        clock.hour,
+        clock.minute,
+      ),
+    ).fold((_) => setState(() => _invalidSelectedTime = true), (time) {
+      setState(() => _invalidSelectedTime = false);
+      _edit((current) => current.withStartingTime(time));
+    });
   }
 
   @override
@@ -189,105 +212,33 @@ class _BaselineHostState extends State<_BaselineHost>
           onPopInvokedWithResult: (didPop, result) {
             if (!didPop) unawaited(_back());
           },
-          child: _content(context, state),
+          child: AbsorbPointer(
+            absorbing: _allowExit,
+            child: _content(context, state),
+          ),
         ),
       );
   Widget _content(BuildContext context, BaselineState state) {
+    void retry() =>
+        context.read<BaselineBloc>().add(const BaselineRetryPressed());
     if (state is BaselineCompleted) {
-      return Column(
-        children: [
-          if (state.refreshFailure != null)
-            SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: const EdgeInsets.all(AppDimensions.medium),
-                child: Column(
-                  children: [
-                    const Text(AppStrings.refreshFailed),
-                    TextButton(
-                      onPressed: () => context.read<BaselineBloc>().add(
-                        const BaselineRetryPressed(),
-                      ),
-                      child: const Text(AppStrings.retry),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          Expanded(
-            child: BaselineLandingPage(
-              baseline: state.baseline,
-              justCompleted: state.justCompleted,
-              onReviewProfile: () => Navigator.of(context).pushNamed(
-                AppRoutes.profile,
-                arguments: ProfileRouteArgs(baseline: state.baseline),
-              ),
-            ),
-          ),
-        ],
-      );
-    }
-    if (state is BaselineLoading) {
-      return const Scaffold(
-        body: SafeArea(child: Center(child: CircularProgressIndicator())),
-      );
-    }
-    if (state is BaselineLoadFailed) {
-      return Scaffold(
-        appBar: AppBar(title: const Text(AppStrings.baselineTitle)),
-        body: BaselineReadingBody(
-          children: [
-            const Text(AppStrings.loadFailed),
-            const SizedBox(height: AppDimensions.medium),
-            const Text(AppStrings.loadProtection),
-            const SizedBox(height: AppDimensions.large),
-            FilledButton(
-              onPressed: () => context.read<BaselineBloc>().add(
-                const BaselineRetryPressed(),
-              ),
-              child: const Text(AppStrings.retry),
-            ),
-          ],
+      return _CompletedStatus(
+        state: state,
+        onRetry: retry,
+        onReviewProfile: () => Navigator.of(context).pushNamed(
+          AppRoutes.profile,
+          arguments: ProfileRouteArgs(baseline: state.baseline),
         ),
       );
     }
+    if (state is BaselineLoading) return const _LoadingStatus();
+    if (state is BaselineLoadFailed) return _LoadFailedStatus(onRetry: retry);
     if (state is BaselineCompleting) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text(AppStrings.baselineTitle),
-          automaticallyImplyLeading: false,
-        ),
-        body: BaselineReadingBody(
-          children: [
-            Semantics(
-              liveRegion: true,
-              child: Text(
-                state.saveFailure == null
-                    ? AppStrings.completing
-                    : AppStrings.completeFailed,
-              ),
-            ),
-            if (state.saveFailure != null) ...[
-              const SizedBox(height: AppDimensions.medium),
-              const Text(AppStrings.uncertainSave),
-              FilledButton(
-                onPressed: state.saving
-                    ? null
-                    : () => context.read<BaselineBloc>().add(
-                        const BaselineRetryPressed(),
-                      ),
-                child: const Text(AppStrings.retry),
-              ),
-              if (state.saveFailure?.writeOutcome == WriteOutcome.notCommitted)
-                TextButton(
-                  onPressed: () => context.read<BaselineBloc>().add(
-                    const BaselineBackPressed(),
-                  ),
-                  child: const Text(AppStrings.editAnswers),
-                ),
-            ],
-          ],
-        ),
+      return _CompletingStatus(
+        state: state,
+        onRetry: retry,
+        onEdit: () =>
+            context.read<BaselineBloc>().add(const BaselineBackPressed()),
       );
     }
     final BaselineEditing editing = state as BaselineEditing;
@@ -302,6 +253,7 @@ class _BaselineHostState extends State<_BaselineHost>
         ),
       ),
       body: BaselineReadingBody(
+        key: ValueKey<OnboardingStep>(draft.step),
         children: [
           Semantics(
             header: true,
@@ -371,6 +323,7 @@ class _BaselineHostState extends State<_BaselineHost>
         controllerFor: controllerFor,
         onEdit: _edit,
         onEditTime: () => _editTime(draft),
+        invalidSelectedTime: _invalidSelectedTime,
       ),
       OnboardingStep.measurements => _MeasurementsStep(
         draft: draft,
@@ -392,6 +345,114 @@ class _BaselineHostState extends State<_BaselineHost>
       ),
     };
   }
+}
+
+class _CompletedStatus extends StatelessWidget {
+  const _CompletedStatus({
+    required this.state,
+    required this.onRetry,
+    required this.onReviewProfile,
+  });
+  final BaselineCompleted state;
+  final VoidCallback onRetry, onReviewProfile;
+  @override
+  Widget build(BuildContext context) => Column(
+    children: [
+      if (state.refreshFailure != null)
+        SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: const EdgeInsets.all(AppDimensions.medium),
+            child: Column(
+              children: [
+                const Text(AppStrings.refreshFailed),
+                TextButton(
+                  onPressed: onRetry,
+                  child: const Text(AppStrings.retry),
+                ),
+              ],
+            ),
+          ),
+        ),
+      Expanded(
+        child: BaselineLandingPage(
+          baseline: state.baseline,
+          justCompleted: state.justCompleted,
+          onReviewProfile: onReviewProfile,
+        ),
+      ),
+    ],
+  );
+}
+
+class _LoadingStatus extends StatelessWidget {
+  const _LoadingStatus();
+  @override
+  Widget build(BuildContext context) => const Scaffold(
+    body: SafeArea(child: Center(child: CircularProgressIndicator())),
+  );
+}
+
+class _LoadFailedStatus extends StatelessWidget {
+  const _LoadFailedStatus({required this.onRetry});
+  final VoidCallback onRetry;
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text(AppStrings.baselineTitle)),
+    body: BaselineReadingBody(
+      children: [
+        const Text(AppStrings.loadFailed),
+        const SizedBox(height: AppDimensions.medium),
+        const Text(AppStrings.loadProtection),
+        const SizedBox(height: AppDimensions.large),
+        FilledButton(onPressed: onRetry, child: const Text(AppStrings.retry)),
+      ],
+    ),
+  );
+}
+
+class _CompletingStatus extends StatelessWidget {
+  const _CompletingStatus({
+    required this.state,
+    required this.onRetry,
+    required this.onEdit,
+  });
+  final BaselineCompleting state;
+  final VoidCallback onRetry, onEdit;
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(
+      title: const Text(AppStrings.baselineTitle),
+      automaticallyImplyLeading: false,
+    ),
+    body: BaselineReadingBody(
+      children: [
+        Semantics(
+          liveRegion: true,
+          child: Text(
+            state.saveFailure == null
+                ? AppStrings.completing
+                : AppStrings.completeFailed,
+          ),
+        ),
+        if (state.saveFailure != null) ...[
+          const SizedBox(height: AppDimensions.medium),
+          const Text(AppStrings.uncertainSave),
+          FilledButton(
+            onPressed: state.saving ? null : onRetry,
+            child: const Text(AppStrings.retry),
+          ),
+          if (state.saveFailure?.writeOutcome == WriteOutcome.notCommitted)
+            TextButton(
+              onPressed: onEdit,
+              child: const Text(AppStrings.editAnswers),
+            ),
+          const SizedBox(height: AppDimensions.large),
+          BaselineProfileDetails(baseline: state.candidate),
+        ],
+      ],
+    ),
+  );
 }
 
 class _BaselineChoice<T> extends StatelessWidget {
@@ -419,6 +480,7 @@ class _BaselineChoice<T> extends StatelessWidget {
       key: ValueKey<String>(label),
       initialValue: value,
       isExpanded: true,
+      isDense: false,
       itemHeight: null,
       decoration: InputDecoration(
         labelText: label,
@@ -498,12 +560,14 @@ class _RequiredBaselineStep extends StatelessWidget {
     required this.controllerFor,
     required this.onEdit,
     required this.onEditTime,
+    required this.invalidSelectedTime,
   });
   final OnboardingDraft draft;
   final FormProblems problems;
   final TextEditingController Function(OnboardingField) controllerFor;
   final void Function(OnboardingDraft Function(OnboardingDraft)) onEdit;
   final VoidCallback onEditTime;
+  final bool invalidSelectedTime;
   @override
   Widget build(BuildContext context) {
     final OnboardingDraft d = draft;
@@ -556,7 +620,8 @@ class _RequiredBaselineStep extends StatelessWidget {
           onPressed: onEditTime,
           child: const Text(AppStrings.editWeightTime),
         ),
-        if (p.invalidStartingTime) const Text(AppStrings.invalidTime),
+        if (p.invalidStartingTime || invalidSelectedTime)
+          const Text(AppStrings.invalidTime),
       ],
     );
   }
@@ -825,12 +890,14 @@ class _BaselineField extends StatelessWidget {
         final double? canonical =
             number == null || !number.isFinite || number <= 0
             ? null
-            : number *
-                  (selectedUnit == 'lb'
-                      ? 0.45359237
-                      : selectedUnit == 'inch'
-                      ? 2.54
-                      : 1);
+            : switch (selectedUnit) {
+                'lb' => BaselineValidation.weightToKg(number, WeightUnit.lb),
+                'inch' => BaselineValidation.lengthToCm(
+                  number,
+                  LengthUnit.inch,
+                ),
+                _ => number,
+              };
         return current.withQuantity(
           field,
           DraftQuantity(

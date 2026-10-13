@@ -12,7 +12,7 @@ import 'package:tspm/main.dart';
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(const MyApp(initialRoute: AppRoutes.counter));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
@@ -33,7 +33,7 @@ void main() {
     ) async {
       tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
       addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
-      await tester.pumpWidget(const MyApp());
+      await tester.pumpWidget(const MyApp(initialRoute: AppRoutes.counter));
 
       final ThemeData theme = Theme.of(tester.element(find.byType(Scaffold)));
       expect(theme.brightness, Brightness.light);
@@ -44,7 +44,9 @@ void main() {
     testWidgets('an explicit dark choice uses the coordinated dark theme', (
       tester,
     ) async {
-      await tester.pumpWidget(const MyApp(themeMode: ThemeMode.dark));
+      await tester.pumpWidget(
+        const MyApp(themeMode: ThemeMode.dark, initialRoute: AppRoutes.counter),
+      );
 
       final ThemeData theme = Theme.of(tester.element(find.byType(Scaffold)));
       expect(theme.brightness, Brightness.dark);
@@ -58,7 +60,9 @@ void main() {
       testWidgets('$mode applies transparent system bars across routes', (
         tester,
       ) async {
-        await tester.pumpWidget(MyApp(themeMode: mode));
+        await tester.pumpWidget(
+          MyApp(themeMode: mode, initialRoute: AppRoutes.counter),
+        );
 
         void expectSystemBars() {
           final Iterable<AnnotatedRegion<SystemUiOverlayStyle>> regions = tester
@@ -98,7 +102,9 @@ void main() {
         addTearDown(tester.view.resetDevicePixelRatio);
         addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
 
-        await tester.pumpWidget(MyApp(themeMode: mode));
+        await tester.pumpWidget(
+          MyApp(themeMode: mode, initialRoute: AppRoutes.counter),
+        );
         expect(tester.takeException(), isNull);
         expect(find.text(AppStrings.counterPrompt), findsOneWidget);
         await tester.tap(find.byTooltip(AppStrings.incrementTooltip));
@@ -112,7 +118,9 @@ void main() {
       ) async {
         final SemanticsHandle handle = tester.ensureSemantics();
         try {
-          await tester.pumpWidget(MyApp(themeMode: mode));
+          await tester.pumpWidget(
+            MyApp(themeMode: mode, initialRoute: AppRoutes.counter),
+          );
 
           await expectLater(tester, meetsGuideline(textContrastGuideline));
           await expectLater(tester, meetsGuideline(androidTapTargetGuideline));

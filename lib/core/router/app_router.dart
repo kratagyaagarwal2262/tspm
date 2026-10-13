@@ -3,11 +3,11 @@ import 'package:tspm/core/router/exports.dart';
 abstract final class AppRouter {
   static Route<void> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
-      case AppRoutes.home:
       case AppRoutes.counter:
         return MaterialPageRoute<void>(
           builder: (_) => const CounterPage(title: AppStrings.homeTitle),
         );
+      case AppRoutes.home:
       case AppRoutes.product:
         return MaterialPageRoute<void>(
           settings: settings,
